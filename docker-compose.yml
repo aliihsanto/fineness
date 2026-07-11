@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fineness}
       POSTGRES_DB: fineness
     ports:
-      - "5434:5432"
+      - "${PG_BIND:-5434}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -20,7 +20,7 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
-      - "6380:6379"
+      - "${REDIS_BIND:-6380}:6379"
     volumes:
       - redisdata:/data
 
@@ -50,7 +50,7 @@ services:
       DATABASE_URL: postgres://fineness:${POSTGRES_PASSWORD:-fineness}@postgres:5432/fineness
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
     ports:
-      - "3000:3000"
+      - "${WEB_BIND:-3000}:3000"
     depends_on:
       postgres:
         condition: service_healthy

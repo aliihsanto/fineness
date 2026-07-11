@@ -1,0 +1,19 @@
+{
+  "name": "fineness",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Fineness — GitHub reality check for tokenized repos. Your fineness score: 11/100.",
+  "scripts": {
+    "dev": "pnpm --filter @fineness/web dev",
+    "dev:worker": "pnpm --filter @fineness/worker dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "db:generate": "pnpm --filter @fineness/db generate",
+    "db:migrate": "pnpm --filter @fineness/db migrate"
+  },
+  "packageManager": "pnpm@11.2.2",
+  "engines": {
+    "node": ">=20"
+  }
+}

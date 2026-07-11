@@ -1,0 +1,30 @@
+{
+  "name": "@fineness/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "seed": "tsx src/seed.ts",
+    "calibrate": "tsx src/calibrate.ts",
+    "backfill": "tsx src/backfill.ts",
+    "map-token": "tsx src/map-token.ts",
+    "tribe-scan": "tsx src/tribe-scan.ts",
+    "tribe-backfill": "tsx src/tribe-backfill.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fineness/db": "workspace:*",
+    "@fineness/github": "workspace:*",
+    "@fineness/market": "workspace:*",
+    "@fineness/scoring": "workspace:*",
+    "@fineness/tribe": "workspace:*",
+    "bullmq": "^5.34.10",
+    "drizzle-orm": "^0.38.4",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

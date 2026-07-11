@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  /* the assay office — jeweler's baize green, hallmark gold, bone paper */
+  --color-ink: #0a0f0d;
+  --color-panel: #0f1613;
+  --color-raised: #16211b;
+  --color-bone: #ede8d8;
+  --color-sage: #97a094;
+  --color-faint: #5d6960;
+  --color-gold: #d9b454;
+  --color-gold-deep: #a9821f;
+  --color-vermilion: #e25d4b;
+  --color-brass: #d9a93c;
+  --color-jade: #4fbf7a;
+
+  --font-display: var(--font-marcellus), Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+body {
+  background: var(--color-ink);
+  background-image: radial-gradient(ellipse 1200px 500px at 50% -200px, rgba(217, 180, 84, 0.06), transparent);
+  color: var(--color-bone);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+::selection {
+  background: rgba(217, 180, 84, 0.25);
+}
+
+.hairline {
+  border-color: rgba(237, 232, 216, 0.07);
+}
+
+.hairline-gold {
+  border-color: rgba(217, 180, 84, 0.22);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  background-image: linear-gradient(100deg, #f0d584 5%, #a9821f 50%, #f0d584 95%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* purity bar ruler ticks */
+.ruler {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(10% - 1px),
+    rgba(237, 232, 216, 0.14) calc(10% - 1px),
+    rgba(237, 232, 216, 0.14) 10%
+  );
+}

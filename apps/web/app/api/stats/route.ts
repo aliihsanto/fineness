@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getStats } from "../../../lib/data";
 
-export const revalidate = 300;
+// always live — a cheap query, and bots/dashboards expect fresh numbers
+export const dynamic = "force-dynamic";
 
 /** Public, no-auth stats endpoint. Bots, X accounts and other dashboards consume this. */
 export async function GET() {

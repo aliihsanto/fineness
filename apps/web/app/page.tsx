@@ -1,25 +1,78 @@
 import Link from "next/link";
 import { getLeaderboard, getStats, type SortKey } from "../lib/data";
-import { fmtAge, fmtNum, fmtUsd } from "../lib/format";
+import { fmtAge, fmtNum, fmtUsd, gradeFor } from "../lib/format";
 import { getLang, t } from "../lib/i18n";
+import type { LeaderboardEntry } from "../lib/types";
 import { ScoreBadge } from "../components/score-badge";
 import { FlagPills } from "../components/flag-pills";
 import { CommitTimeline } from "../components/commit-timeline";
 
 const SORT_KEYS: SortKey[] = ["gap", "fineness", "fdv", "volume"];
+const TABS = ["all", "tribe", "other"] as const;
+type Tab = (typeof TABS)[number];
 
-type Props = { searchParams: Promise<{ sort?: string }> };
+const MONEY_STEPS = [
+  { value: "", label: "—" },
+  { value: "100000", label: "$100K" },
+  { value: "1000000", label: "$1M" },
+  { value: "10000000", label: "$10M" },
+  { value: "100000000", label: "$100M" },
+  { value: "1000000000", label: "$1B" },
+];
+
+type Search = {
+  sort?: string;
+  tab?: string;
+  minFdv?: string;
+  minVol?: string;
+  minMcap?: string;
+  grade?: string;
+};
+
+function query(params: Search, overrides: Partial<Search>): string {
+  const merged: Record<string, string | undefined> = { ...params, ...overrides };
+  const q = Object.entries(merged)
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k}=${encodeURIComponent(v!)}`)
+    .join("&");
+  return q ? `/?${q}` : "/";
+}
+
+function applyFilters(entries: LeaderboardEntry[], s: Search): LeaderboardEntry[] {
+  return entries.filter((e) => {
+    if (s.tab === "tribe" && e.platform !== "tribe") return false;
+    if (s.tab === "other" && e.platform === "tribe") return false;
+    if (s.minFdv && (e.fdv ?? 0) < Number(s.minFdv)) return false;
+    if (s.minVol && (e.volume24h ?? 0) < Number(s.minVol)) return false;
+    if (s.minMcap && (e.mcap ?? 0) < Number(s.minMcap)) return false;
+    if (s.grade) {
+      const g = e.total >= 70 ? "high" : e.total >= 40 ? "alloyed" : "base";
+      if (g !== s.grade) return false;
+    }
+    return true;
+  });
+}
+
+type Props = { searchParams: Promise<Search> };
 
 export default async function Leaderboard({ searchParams }: Props) {
-  const { sort: rawSort } = await searchParams;
-  const sort: SortKey = SORT_KEYS.includes(rawSort as SortKey) ? (rawSort as SortKey) : "gap";
+  const params = await searchParams;
+  const sort: SortKey = SORT_KEYS.includes(params.sort as SortKey) ? (params.sort as SortKey) : "gap";
+  const tab: Tab = TABS.includes(params.tab as Tab) ? (params.tab as Tab) : "all";
   const lang = await getLang();
   const d = t(lang).home;
-  const [entries, stats] = await Promise.all([getLeaderboard(sort), getStats()]);
+  const [all, stats] = await Promise.all([getLeaderboard(sort), getStats()]);
+  const entries = applyFilters(all, { ...params, tab });
+  const counts = {
+    all: all.length,
+    tribe: all.filter((e) => e.platform === "tribe").length,
+    other: all.filter((e) => e.platform !== "tribe").length,
+  };
+  const hasFilters = Boolean(params.minFdv || params.minVol || params.minMcap || params.grade);
 
   return (
     <div>
-      <section className="mb-10">
+      <section className="mb-8">
         <div className="font-mono text-[11px] tracking-[0.35em] text-gold">{d.eyebrow}</div>
         <h1 className="mt-3 max-w-3xl font-display text-5xl leading-tight text-bone">{d.title}</h1>
         <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-sage">
@@ -46,12 +99,63 @@ export default async function Leaderboard({ searchParams }: Props) {
         )}
       </section>
 
-      <div className="mb-3 flex items-center gap-4 font-mono text-[10px] tracking-[0.25em] text-faint">
+      {/* platform tabs */}
+      <div className="flex border-b hairline-gold">
+        {TABS.map((key) => (
+          <Link
+            key={key}
+            href={query(params, { tab: key === "all" ? undefined : key })}
+            className={`-mb-px border-b-2 px-5 py-2.5 font-mono text-[11px] tracking-[0.25em] transition ${
+              tab === key
+                ? "border-gold text-gold"
+                : "border-transparent text-sage hover:text-bone"
+            }`}
+          >
+            {d.tabs[key]} <span className="text-faint">{counts[key]}</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* filters */}
+      <form method="GET" action="/" className="mt-4 flex flex-wrap items-end gap-4">
+        {tab !== "all" && <input type="hidden" name="tab" value={tab} />}
+        {sort !== "gap" && <input type="hidden" name="sort" value={sort} />}
+        <Filter name="minFdv" label={d.filters.fdv} value={params.minFdv} options={MONEY_STEPS} />
+        <Filter name="minVol" label={d.filters.vol} value={params.minVol} options={MONEY_STEPS} />
+        <Filter name="minMcap" label={d.filters.mcap} value={params.minMcap} options={MONEY_STEPS} />
+        <Filter
+          name="grade"
+          label={d.filters.grade}
+          value={params.grade}
+          options={[
+            { value: "", label: d.filters.any },
+            { value: "base", label: d.grades.base },
+            { value: "alloyed", label: d.grades.alloyed },
+            { value: "high", label: d.grades.high },
+          ]}
+        />
+        <button
+          type="submit"
+          className="cursor-pointer border border-gold/60 bg-gold/10 px-4 py-1.5 font-mono text-[10px] font-semibold tracking-[0.25em] text-gold transition hover:bg-gold hover:text-ink"
+        >
+          {d.filters.apply}
+        </button>
+        {hasFilters && (
+          <Link
+            href={query({ sort: params.sort, tab: params.tab }, {})}
+            className="py-1.5 font-mono text-[10px] tracking-[0.25em] text-faint transition hover:text-bone"
+          >
+            {d.filters.clear}
+          </Link>
+        )}
+      </form>
+
+      <div className="mb-3 mt-5 flex items-center gap-4 font-mono text-[10px] tracking-[0.25em] text-faint">
         <span>{d.sortBy}</span>
         {SORT_KEYS.map((key) => (
           <Link
             key={key}
-            href={key === "gap" ? "/" : `/?sort=${key}`}
+            href={query(params, { sort: key === "gap" ? undefined : key })}
             className={`border-b pb-0.5 transition ${
               sort === key ? "border-gold text-gold" : "border-transparent text-sage hover:text-bone"
             }`}
@@ -78,8 +182,15 @@ export default async function Leaderboard({ searchParams }: Props) {
             </tr>
           </thead>
           <tbody>
+            {entries.length === 0 && (
+              <tr>
+                <td colSpan={10} className="py-10 text-center font-mono text-xs tracking-[0.2em] text-faint">
+                  {d.noMatch}
+                </td>
+              </tr>
+            )}
             {entries.map((e, i) => (
-              <tr key={e.symbol} className="border-b hairline align-top transition hover:bg-panel">
+              <tr key={`${e.chain}-${e.symbol}`} className="border-b hairline align-top transition hover:bg-panel">
                 <td className="py-4 pr-3 font-mono text-xs text-faint">{String(i + 1).padStart(2, "0")}</td>
                 <td className="py-4 pr-5">
                   <Link href={`/t/${e.symbol}`} className="group flex flex-col">
@@ -144,6 +255,35 @@ export default async function Leaderboard({ searchParams }: Props) {
         </table>
       </div>
     </div>
+  );
+}
+
+function Filter({
+  name,
+  label,
+  value,
+  options,
+}: {
+  name: string;
+  label: string;
+  value: string | undefined;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <label className="flex flex-col gap-1">
+      <span className="font-mono text-[9px] tracking-[0.25em] text-faint">{label}</span>
+      <select
+        name={name}
+        defaultValue={value ?? ""}
+        className="border hairline bg-panel px-2 py-1.5 font-mono text-xs text-bone outline-none focus:border-gold/60"
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 

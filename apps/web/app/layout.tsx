@@ -21,6 +21,7 @@ const plexMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://fineness.xyz"),
   title: "fineness — assay office for tokenized repos",
   description:
     "Scan the repo behind any token. Your fineness score: verifiable GitHub data, not vibes. Fork detection, AI-slop detection, rug watch.",

@@ -36,6 +36,10 @@ const en = {
     demoBadge: "DEMO DATA — AWAITING DATABASE_URL",
     sortBy: "SORT BY",
     sorts: { gap: "REALITY GAP", fineness: "FINENESS", fdv: "FDV", volume: "VOL 24H" },
+    tabs: { all: "ALL", tribe: "TRIBE", other: "ESTABLISHED" },
+    filters: { fdv: "MIN FDV", vol: "MIN VOL 24H", mcap: "MIN MCAP", grade: "GRADE", any: "ANY", apply: "APPLY", clear: "CLEAR" },
+    grades: { base: "BASE METAL", alloyed: "ALLOYED", high: "HIGH PURITY" },
+    noMatch: "No tokens match these filters.",
     th: {
       token: "TOKEN",
       fineness: "FINENESS",
@@ -190,6 +194,10 @@ const tr: Dict = {
     demoBadge: "DEMO VERİ — DATABASE_URL BEKLENİYOR",
     sortBy: "SIRALA",
     sorts: { gap: "REALITY GAP", fineness: "FINENESS", fdv: "FDV", volume: "HACİM 24S" },
+    tabs: { all: "TÜMÜ", tribe: "TRIBE", other: "YERLEŞİK" },
+    filters: { fdv: "MİN FDV", vol: "MİN HACİM 24S", mcap: "MİN MCAP", grade: "DERECE", any: "HEPSİ", apply: "UYGULA", clear: "TEMİZLE" },
+    grades: { base: "BASE METAL", alloyed: "ALLOYED", high: "HIGH PURITY" },
+    noMatch: "Bu filtrelere uyan token yok.",
     th: {
       token: "TOKEN",
       fineness: "FINENESS",

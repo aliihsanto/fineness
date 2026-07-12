@@ -5,6 +5,8 @@ export type MarketQuote = {
   volume24h: number | null;
   liquidity: number | null;
   pairAddress: string | null;
+  baseSymbol: string | null;
+  baseName: string | null;
 };
 
 const BASE = "https://api.dexscreener.com";
@@ -35,5 +37,7 @@ export async function fetchTokenQuote(chain: string, mintAddress: string): Promi
     volume24h: best.volume?.h24 ?? null,
     liquidity: best.liquidity?.usd ?? null,
     pairAddress: best.pairAddress ?? null,
+    baseSymbol: best.baseToken?.symbol ?? null,
+    baseName: best.baseToken?.name ?? null,
   };
 }

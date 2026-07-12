@@ -15,6 +15,7 @@ export const QUEUE_NAMES = {
   ingestGithub: "ingest-github",
   ingestMarket: "ingest-market",
   ingestTribe: "ingest-tribe",
+  discover: "discover",
   computeScore: "compute-score",
   snapshot: "snapshot",
 } as const;
@@ -22,6 +23,7 @@ export const QUEUE_NAMES = {
 export const ingestGithubQueue = new Queue(QUEUE_NAMES.ingestGithub, { connection });
 export const ingestMarketQueue = new Queue(QUEUE_NAMES.ingestMarket, { connection });
 export const ingestTribeQueue = new Queue(QUEUE_NAMES.ingestTribe, { connection });
+export const discoverQueue = new Queue(QUEUE_NAMES.discover, { connection });
 export const computeScoreQueue = new Queue(QUEUE_NAMES.computeScore, { connection });
 export const snapshotQueue = new Queue(QUEUE_NAMES.snapshot, { connection });
 

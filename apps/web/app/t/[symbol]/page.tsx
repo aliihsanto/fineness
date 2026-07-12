@@ -61,7 +61,7 @@ export default async function TokenPage({ params }: Props) {
 
           <div className="mt-8 flex flex-wrap items-start justify-between gap-10">
             <div className="min-w-0">
-              <h1 className="font-display text-6xl leading-none text-bone">${entry.symbol}</h1>
+              <h1 className="break-all font-display text-4xl leading-none text-bone sm:text-6xl">${entry.symbol}</h1>
               <div className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
                 {entry.tokenName} · {entry.chain} · {entry.platform}
                 {entry.launchedDaysAgo !== null ? ` · ${d.launched(entry.launchedDaysAgo)}` : ""}

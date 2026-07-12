@@ -40,6 +40,11 @@ const en = {
     filters: { fdv: "MIN FDV", vol: "MIN VOL 24H", mcap: "MIN MCAP", grade: "GRADE", any: "ANY", apply: "APPLY", clear: "CLEAR" },
     grades: { base: "BASE METAL", alloyed: "ALLOYED", high: "HIGH PURITY" },
     noMatch: "No tokens match these filters.",
+    platform: "PLATFORM",
+    filtersTitle: "FILTERS",
+    prev: "← PREV",
+    next: "NEXT →",
+    showing: (a: number, b: number, n: number) => `SHOWING ${a}–${b} OF ${n}`,
     th: {
       token: "TOKEN",
       fineness: "FINENESS",
@@ -198,6 +203,11 @@ const tr: Dict = {
     filters: { fdv: "MİN FDV", vol: "MİN HACİM 24S", mcap: "MİN MCAP", grade: "DERECE", any: "HEPSİ", apply: "UYGULA", clear: "TEMİZLE" },
     grades: { base: "BASE METAL", alloyed: "ALLOYED", high: "HIGH PURITY" },
     noMatch: "Bu filtrelere uyan token yok.",
+    platform: "PLATFORM",
+    filtersTitle: "FİLTRELER",
+    prev: "← ÖNCEKİ",
+    next: "SONRAKİ →",
+    showing: (a: number, b: number, n: number) => `${n} KAYITTAN ${a}–${b} GÖSTERİLİYOR`,
     th: {
       token: "TOKEN",
       fineness: "FINENESS",

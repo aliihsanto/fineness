@@ -35,13 +35,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={lang} className={`${marcellus.variable} ${plexMono.variable}`}>
       <body className="min-h-screen">
         <header className="border-b hairline-gold">
-          <div className="mx-auto flex max-w-6xl items-end justify-between px-5 py-5">
-            <Link href="/" className="flex flex-col gap-1">
-              <span className="wordmark text-3xl leading-none">fineness</span>
-              <span className="font-mono text-[10px] tracking-[0.3em] text-faint">{d.layout.tagline}</span>
+          <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-5 sm:py-5">
+            <Link href="/" className="flex min-w-0 flex-col gap-1">
+              <span className="wordmark text-2xl leading-none sm:text-3xl">fineness</span>
+              <span className="hidden font-mono text-[10px] tracking-[0.3em] text-faint sm:block">
+                {d.layout.tagline}
+              </span>
             </Link>
-            <div className="flex items-center gap-7">
-              <nav className="flex gap-7 font-mono text-[11px] tracking-[0.2em] text-sage">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-7">
+              <nav className="flex gap-4 font-mono text-[10px] tracking-[0.15em] text-sage sm:gap-7 sm:text-[11px] sm:tracking-[0.2em]">
                 <Link href="/methodology" className="transition hover:text-gold">
                   {d.layout.methodology}
                 </Link>
@@ -56,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </div>
         </header>
-        <main className="mx-auto max-w-6xl px-5 py-10">{children}</main>
+        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-5 sm:py-10">{children}</main>
         <footer className="mt-16 border-t hairline">
           <div className="mx-auto max-w-6xl px-5 py-8 font-mono text-[11px] leading-relaxed tracking-wide text-faint">
             {d.layout.footer1}

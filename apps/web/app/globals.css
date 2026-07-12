@@ -19,6 +19,8 @@
 }
 
 body {
+  /* wide content scrolls in its own containers — the page itself never pans */
+  overflow-x: clip;
   background: var(--color-ink);
   background-image: radial-gradient(ellipse 1200px 500px at 50% -200px, rgba(217, 180, 84, 0.06), transparent);
   color: var(--color-bone);

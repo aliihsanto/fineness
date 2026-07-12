@@ -34,7 +34,7 @@ export async function discoverDex(): Promise<number> {
  * CoinGecko discovery — daily. AI categories carry GitHub links in coin
  * metadata; this back-fills the established-token side of the ledger.
  */
-export async function discoverCoingecko(categories = ["ai-agents", "artificial-intelligence"], limit = 30) {
+export async function discoverCoingecko(categories = ["ai-agents", "artificial-intelligence"], limit = 100) {
   const db = createDb();
   let created = 0;
   for (const category of categories) {

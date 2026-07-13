@@ -49,7 +49,7 @@ export function extractGithubRepo(url: string): { owner: string; name: string } 
 export async function discoverCategory(
   category: string,
   limit = 30,
-  throttleMs = 7000,
+  throttleMs = 15_000,
 ): Promise<DiscoveredCoin[]> {
   const markets = await cg<{ id: string; symbol: string; name: string; fully_diluted_valuation: number | null }[]>(
     `/coins/markets?vs_currency=usd&category=${encodeURIComponent(category)}&per_page=${limit}&page=1`,

@@ -37,7 +37,7 @@ const REPO_QUERY = /* GraphQL */ `
                 committedDate
                 additions
                 deletions
-                messageHeadline
+                messageHeadline: message
                 author {
                   user {
                     login
@@ -187,7 +187,12 @@ export class GithubClient {
       license: r.licenseInfo?.key ?? null,
       language: r.primaryLanguage?.name ?? null,
       defaultBranch: r.defaultBranchRef?.name ?? null,
-      commits: r.defaultBranchRef?.target?.history?.nodes ?? [],
+      // full message (incl. Co-Authored-By trailers — the AI-provenance signal),
+      // capped so a pasted changelog can't bloat the row
+      commits: (r.defaultBranchRef?.target?.history?.nodes ?? []).map((n: RawCommitNode) => ({
+        ...n,
+        messageHeadline: (n.messageHeadline ?? "").slice(0, 2000),
+      })),
       rootEntries: entries,
       hasTests: names.some((n) => TEST_HINTS.includes(n)),
       hasCI: names.includes(".github") || names.includes(".gitlab-ci.yml") || names.includes(".circleci"),

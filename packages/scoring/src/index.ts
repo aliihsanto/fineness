@@ -6,7 +6,7 @@ import { momentumScore } from "./momentum";
 import { communityScore } from "./community";
 import { computeFlags } from "./flags";
 
-export const ALGO_VERSION = "0.1.0";
+export const ALGO_VERSION = "0.2.0";
 
 /**
  * Fineness Score (0-100) = Authenticity/30 + Anti-Slop/25 + Bus Factor/15

@@ -13,7 +13,8 @@
     "tribe-scan": "tsx src/tribe-scan.ts",
     "tribe-backfill": "tsx src/tribe-backfill.ts",
     "discover": "tsx src/discover.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "recompute": "tsx src/recompute.ts"
   },
   "dependencies": {
     "@fineness/db": "workspace:*",

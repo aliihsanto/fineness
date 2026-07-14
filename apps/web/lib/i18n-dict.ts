@@ -23,7 +23,7 @@ const en = {
       median: "MEDIAN FINENESS",
       forks: "FORKS",
       slop: "AI SLOP",
-      dead: "DEAD 14D+",
+      dead: "DEAD",
       shipping: "SHIPPING",
     },
     demoBadge: "DEMO DATA — AWAITING DATABASE_URL",
@@ -158,7 +158,7 @@ const en = {
       },
       {
         title: "ANTI-SLOP — 25 PTS",
-        body: "Did humans build this over time, or did an AI dump it overnight? Commit size distribution (human median is ~30-250 added lines), machine-gun commit bursts (<3 min apart), commit message entropy (templated messages collapse to one bucket), circadian rhythm (humans sleep; a 24h histogram with no 4-hour gap is suspicious), and engineering hygiene (tests, CI, lockfile).",
+        body: "Did humans build this over time, or did an AI dump it overnight? Commit size distribution (human median is ~30-250 added lines), machine-gun commit bursts (<3 min apart), commit message entropy (templated messages collapse to one bucket), circadian rhythm (humans sleep; a 24h histogram with no 4-hour gap is suspicious), and engineering hygiene (tests, CI, lockfile). v0.2 adds provenance forensics: AI co-author markers in commit messages, near-total duplicate messages, metronome-regular commit cadence, and whole-repo single-session dumps. AI-assisted is not AI-dumped — markers only cost points when the commit pattern independently looks machine-made.",
       },
       {
         title: "BUS FACTOR — 15 PTS",
@@ -166,7 +166,7 @@ const en = {
       },
       {
         title: "MOMENTUM — 20 PTS",
-        body: "Recency decays exponentially: exp(−daysSinceLastPush / 10). Post-launch decay ratio compares commits 7 days after launch vs 7 days before — below 0.2 raises the RUG WATCH flag.",
+        body: "Recency decays exponentially: exp(−daysSinceLastPush / τ), and τ is maturity-aware — a fresh repo goes stale in days (τ=10), a 3-year-old protocol earns a slower clock (τ up to 40), because finished software isn't dead software. The DEAD stamp scales the same way: 14 quiet days kill a young repo, mature ones get up to 60. Post-launch decay ratio compares commits 7 days after launch vs 7 days before — below 0.2 raises the RUG WATCH flag.",
       },
       {
         title: "COMMUNITY — 10 PTS",

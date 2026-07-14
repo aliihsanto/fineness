@@ -38,3 +38,44 @@ describe("antiSlopScore calibration", () => {
     expect(withBots.score).toBe(withoutBots.score);
   });
 });
+
+describe("provenance forensics (v0.2)", () => {
+  it("does NOT penalize AI co-author markers on a human-shaped history", () => {
+    // AI-assisted development: human rhythm + markers in every message
+    const assisted = humanCommits(42).map((c) => ({
+      ...c,
+      message: `${c.message}\n\nCo-Authored-By: Claude <noreply@anthropic.com>`,
+    }));
+    const plain = antiSlopScore(humanCommits(42), hygieneFull);
+    const marked = antiSlopScore(assisted, hygieneFull);
+    expect(Number(marked.signals.aiMarkerRatio)).toBe(1);
+    expect(Number(marked.signals.slopPenalty)).toBe(0);
+    expect(marked.score).toBe(plain.score);
+  });
+
+  it("penalizes AI markers when the pattern is machine-made", () => {
+    const dumped = slopCommits(7).map((c) => ({
+      ...c,
+      message: `${c.message}\n\n🤖 Generated with Claude`,
+    }));
+    const { signals } = antiSlopScore(dumped, hygieneNone);
+    expect(Number(signals.aiMarkerRatio)).toBe(1);
+    expect(Number(signals.slopPenalty)).toBeGreaterThanOrEqual(0.15);
+  });
+
+  it("flags a single-session dump by a small team", () => {
+    const { signals } = antiSlopScore(slopCommits(7), hygieneNone);
+    expect(signals.singleSession).toBe(true);
+    expect(Number(signals.slopPenalty)).toBeGreaterThanOrEqual(0.12);
+  });
+
+  it("catches metronome cadence — commits on a fixed clock", () => {
+    const base = slopCommits(7, 30).map((c, i) => ({
+      ...c,
+      // exactly every 10 minutes, spread wide enough to dodge singleSession
+      committedAt: new Date(Date.parse("2026-06-20T00:00:00Z") + i * 10 * 60_000),
+    }));
+    const { signals } = antiSlopScore(base, hygieneNone);
+    expect(signals.metronome).toBe(true);
+  });
+});

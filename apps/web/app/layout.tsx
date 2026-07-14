@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import localFont from "next/font/local";
+import Image from "next/image";
 import { t } from "../lib/i18n";
-import { LogoMark } from "../components/logo";
+import logo from "../assets/logo.png";
 import "./globals.css";
 
 const marcellus = localFont({
@@ -36,7 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="border-b hairline-gold">
           <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-5 sm:py-5">
             <Link href="/" className="flex min-w-0 items-center gap-3">
-              <LogoMark className="h-9 w-auto shrink-0 sm:h-10" />
+              <Image src={logo} alt="" priority className="h-9 w-auto shrink-0 sm:h-10" />
               <span className="flex min-w-0 flex-col gap-1">
                 <span className="wordmark text-2xl leading-none sm:text-3xl">fineness</span>
                 <span className="hidden font-mono text-[10px] tracking-[0.3em] text-faint sm:block">

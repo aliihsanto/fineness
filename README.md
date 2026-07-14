@@ -1,4 +1,15 @@
-# fineness
+<p align="center">
+  <a href="https://fineness.xyz"><img src="apps/web/assets/logo.png" width="90" alt="fineness"></a>
+</p>
+
+<h1 align="center">fineness</h1>
+
+<p align="center">
+  <a href="https://fineness.xyz">fineness.xyz</a> ·
+  <a href="https://fineness.xyz/docs">API</a> ·
+  <a href="https://fineness.xyz/methodology">methodology</a> ·
+  <a href="https://tribe.run/token/8eUAUP9R8uqJ2MiUoDF6xF2AxNAXmfp4G1DSe4Mki4f4">$FINENESS on Tribe</a>
+</p>
 
 **GitHub reality check for tokenized repos.** Scan the repo behind any token — get a
 verifiable **fineness score** (0-100), like gold purity for code:

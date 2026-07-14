@@ -31,16 +31,17 @@ const FLAG_LABELS: Record<string, string> = {
   SHIPPING: "SHIPPING",
 };
 
-let fontsPromise: Promise<{ marcellus: Buffer; mono: Buffer; monoSemi: Buffer }> | null = null;
+let fontsPromise: Promise<{ marcellus: Buffer; mono: Buffer; monoSemi: Buffer; logo: string }> | null = null;
 function loadFonts() {
   fontsPromise ??= (async () => {
     const dir = path.join(process.cwd(), "assets", "fonts");
-    const [marcellus, mono, monoSemi] = await Promise.all([
+    const [marcellus, mono, monoSemi, logoPng] = await Promise.all([
       readFile(path.join(dir, "Marcellus-Regular.ttf")),
       readFile(path.join(dir, "IBMPlexMono-Regular.ttf")),
       readFile(path.join(dir, "IBMPlexMono-SemiBold.ttf")),
+      readFile(path.join(process.cwd(), "assets", "logo.png")),
     ]);
-    return { marcellus, mono, monoSemi };
+    return { marcellus, mono, monoSemi, logo: `data:image/png;base64,${logoPng.toString("base64")}` };
   })();
   return fontsPromise;
 }
@@ -50,7 +51,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ symbol:
   const entry = await getEntryBySymbol(symbol);
   if (!entry) return new Response("not found", { status: 404 });
 
-  const { marcellus, mono, monoSemi } = await loadFonts();
+  const { marcellus, mono, monoSemi, logo } = await loadFonts();
   const g = grade(entry.total);
   const max = Math.max(...entry.commitTimeline, 1);
   const sym = `$${entry.symbol}`;
@@ -201,21 +202,24 @@ export async function GET(_req: Request, { params }: { params: Promise<{ symbol:
                   COMMIT ACTIVITY · 12 WEEKS
                 </div>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    fontFamily: "Marcellus",
-                    fontSize: 38,
-                    backgroundImage: "linear-gradient(100deg, #F0D584 10%, #A9821F 55%, #F0D584 95%)",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  fineness.xyz
-                </div>
-                <div style={{ display: "flex", fontSize: 14, letterSpacing: 1.5, color: DIM, marginTop: 6 }}>
-                  VERIFIABLE GITHUB DATA · NOT FINANCIAL ADVICE
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <img src={logo} width={41} height={64} style={{ width: 41, height: 64 }} />
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: "Marcellus",
+                      fontSize: 38,
+                      backgroundImage: "linear-gradient(100deg, #F0D584 10%, #A9821F 55%, #F0D584 95%)",
+                      backgroundClip: "text",
+                      color: "transparent",
+                    }}
+                  >
+                    fineness.xyz
+                  </div>
+                  <div style={{ display: "flex", fontSize: 14, letterSpacing: 1.5, color: DIM, marginTop: 6 }}>
+                    VERIFIABLE GITHUB DATA · NOT FINANCIAL ADVICE
+                  </div>
                 </div>
               </div>
             </div>

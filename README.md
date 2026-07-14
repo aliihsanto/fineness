@@ -57,3 +57,11 @@ Project owners can dispute or correct a token↔repo mapping via `/api/submit` o
 opening an issue.
 
 MIT
+
+<!-- hypertribe:sponsors:start -->
+## Sponsors
+
+[![fineness Sponsors](https://api.tribe.run/tokens/8eUAUP9R8uqJ2MiUoDF6xF2AxNAXmfp4G1DSe4Mki4f4/sponsors.svg)](https://tribe.run/token/8eUAUP9R8uqJ2MiUoDF6xF2AxNAXmfp4G1DSe4Mki4f4)
+
+Become a sponsor on [Tribe.run](https://tribe.run/token/8eUAUP9R8uqJ2MiUoDF6xF2AxNAXmfp4G1DSe4Mki4f4).
+<!-- hypertribe:sponsors:end -->

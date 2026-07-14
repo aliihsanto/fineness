@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getLeaderboard, getStats } from "../lib/data";
 import { fmtUsd } from "../lib/format";
+import { ScoreBadge } from "../components/score-badge";
 import { getLang, t } from "../lib/i18n";
 import type { LeaderboardEntry } from "../lib/types";
 import { LeaderboardTable } from "../components/leaderboard-table";
@@ -60,18 +61,24 @@ export default async function Leaderboard({ searchParams }: Props) {
   const hasFilters = Boolean(params.minFdv || params.minVol || params.minMcap || params.grade);
   const panel = <FilterPanel d={d} params={params} tab={tab} counts={counts} hasFilters={hasFilters} />;
 
+  const promoted = all.find((e) => e.promoted) ?? null;
+
   return (
     <div>
-      <section className="mb-8">
-        <div className="font-mono text-[11px] tracking-[0.35em] text-gold">{d.eyebrow}</div>
-        <h1 className="mt-3 max-w-3xl font-display text-3xl leading-tight text-bone sm:text-5xl">{d.title}</h1>
-        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-sage">
-          {d.introA}
-          <span className="text-bone">{d.gapWord}</span>
-          {d.introB}
-        </p>
+      <section className="mb-6">
+        <div className="flex flex-col gap-x-10 gap-y-2 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <div className="font-mono text-[10px] tracking-[0.35em] text-gold">{d.eyebrow}</div>
+            <h1 className="mt-1.5 font-display text-2xl leading-tight text-bone sm:text-3xl">{d.title}</h1>
+          </div>
+          <p className="max-w-xl text-[13px] leading-relaxed text-sage lg:pb-0.5">
+            {d.introA}
+            <span className="text-bone">{d.gapWord}</span>
+            {d.introB}
+          </p>
+        </div>
 
-        <div className="mt-8 flex flex-wrap items-stretch border-y hairline-gold">
+        <div className="mt-4 flex flex-wrap items-stretch border-y hairline-gold">
           <Stat label={d.stats.repos} value={String(stats.reposScanned)} />
           <Stat label={d.stats.fdv} value={fmtUsd(stats.totalFdv)} />
           <Stat label={d.stats.median} value={`${stats.medianFinenessScore}/100`} />
@@ -88,6 +95,41 @@ export default async function Leaderboard({ searchParams }: Props) {
           </div>
         )}
       </section>
+
+      {promoted && (
+        <div className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3 border border-gold/40 bg-gold/5 px-4 py-3 sm:px-5">
+          <span className="border border-gold/60 bg-gold/15 px-2 py-0.5 font-mono text-[9px] font-semibold tracking-[0.3em] text-gold">
+            {d.promo.stamp}
+          </span>
+          <Link href={`/t/${promoted.symbol}`} className="group flex items-center gap-3">
+            <span className="font-mono text-[15px] font-semibold text-bone transition group-hover:text-gold">
+              ${promoted.symbol}
+            </span>
+            <ScoreBadge total={promoted.total} />
+          </Link>
+          {promoted.fdv !== null && (
+            <span className="font-mono text-xs text-sage">
+              FDV <span className="text-bone">{fmtUsd(promoted.fdv)}</span>
+            </span>
+          )}
+          <span className="hidden max-w-md text-[12px] leading-snug text-sage md:block">{d.promo.blurb}</span>
+          <span className="ml-auto flex items-center gap-4 font-mono text-[10px] tracking-[0.2em]">
+            <Link href={`/t/${promoted.symbol}`} className="text-gold transition hover:text-bone">
+              {d.promo.view}
+            </Link>
+            {promoted.mintAddress && (
+              <a
+                href={`https://tribe.run/token/${promoted.mintAddress}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sage transition hover:text-gold"
+              >
+                {d.promo.trade}
+              </a>
+            )}
+          </span>
+        </div>
+      )}
 
       <div className="lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-8">
         <details className="mb-4 border hairline bg-panel lg:hidden">
@@ -216,9 +258,9 @@ function Stat({
   accent?: "jade";
 }) {
   return (
-    <div className={`mr-7 flex flex-col gap-1 py-4 pr-7 ${last ? "" : "border-r hairline"}`}>
-      <span className={`font-mono text-2xl ${accent === "jade" ? "text-jade" : "text-bone"}`}>{value}</span>
-      <span className="font-mono text-[10px] tracking-[0.25em] text-faint">{label}</span>
+    <div className={`mr-5 flex flex-col gap-0.5 py-3 pr-5 sm:mr-6 sm:pr-6 ${last ? "" : "border-r hairline"}`}>
+      <span className={`font-mono text-lg sm:text-xl ${accent === "jade" ? "text-jade" : "text-bone"}`}>{value}</span>
+      <span className="font-mono text-[9px] tracking-[0.25em] text-faint sm:text-[10px]">{label}</span>
     </div>
   );
 }

@@ -44,4 +44,6 @@ export type LeaderboardEntry = {
   hourHistogram: number[];
   signals: Record<string, unknown>;
   demo?: boolean;
+  /** the house token — always pinned to the top of the ledger */
+  promoted?: boolean;
 };

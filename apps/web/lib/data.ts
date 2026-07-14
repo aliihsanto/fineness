@@ -3,6 +3,9 @@ import type { LeaderboardEntry } from "./types";
 
 export type SortKey = "gap" | "fineness" | "fdv" | "volume";
 
+/** the house token, launched on Tribe — pinned above the ledger */
+const PROMOTED_SYMBOL = process.env.NEXT_PUBLIC_PROMOTED_SYMBOL ?? "FINENESS";
+
 /**
  * Data access layer. Reads from Postgres when DATABASE_URL is set,
  * otherwise serves the demo dataset so the UI is never empty.
@@ -171,6 +174,7 @@ async function tryDb(): Promise<LeaderboardEntry[] | null> {
         e.symbol = `${e.symbol}.${owner.toUpperCase().slice(0, 12)}`;
       }
     }
+    for (const e of entries) if (e.symbol === PROMOTED_SYMBOL) e.promoted = true;
     return entries.length > 0 ? entries : null;
   } catch (err) {
     console.warn("[data] DB unavailable, serving demo data:", (err as Error).message);

@@ -17,14 +17,21 @@ function sortEntries(entries: LeaderboardEntry[], sort: SortKey): LeaderboardEnt
   const a = [...entries];
   switch (sort) {
     case "fineness":
-      return a.sort((x, y) => x.total - y.total); // worst first — the product thesis
+      a.sort((x, y) => x.total - y.total); // worst first — the product thesis
+      break;
     case "fdv":
-      return a.sort((x, y) => (y.fdv ?? -1) - (x.fdv ?? -1));
+      a.sort((x, y) => (y.fdv ?? -1) - (x.fdv ?? -1));
+      break;
     case "volume":
-      return a.sort((x, y) => (y.volume24h ?? -1) - (x.volume24h ?? -1));
+      a.sort((x, y) => (y.volume24h ?? -1) - (x.volume24h ?? -1));
+      break;
     default:
-      return a.sort((x, y) => (y.realityGap ?? -1) - (x.realityGap ?? -1));
+      a.sort((x, y) => (y.realityGap ?? -1) - (x.realityGap ?? -1));
   }
+  // the house token stays pinned on top regardless of sort
+  const i = a.findIndex((e) => e.promoted);
+  if (i > 0) a.unshift(...a.splice(i, 1));
+  return a;
 }
 
 export function LeaderboardTable({ entries, lang }: { entries: LeaderboardEntry[]; lang: Lang }) {
@@ -85,14 +92,22 @@ export function LeaderboardTable({ entries, lang }: { entries: LeaderboardEntry[
               </tr>
             )}
             {rows.map((e, i) => (
-              <tr key={`${e.chain}-${e.symbol}`} className="border-b hairline align-top transition hover:bg-panel">
+              <tr
+                key={`${e.chain}-${e.symbol}`}
+                className={`border-b hairline align-top transition hover:bg-panel ${e.promoted ? "bg-gold/5" : ""}`}
+              >
                 <td className="py-4 pr-3 font-mono text-xs text-faint">
                   {String(rankOffset + i + 1).padStart(2, "0")}
                 </td>
                 <td className="py-4 pr-5">
                   <Link href={`/t/${e.symbol}`} className="group flex flex-col">
-                    <span className="font-mono text-[15px] font-semibold text-bone transition group-hover:text-gold">
+                    <span className="flex items-center gap-2 font-mono text-[15px] font-semibold text-bone transition group-hover:text-gold">
                       ${e.symbol}
+                      {e.promoted && (
+                        <span className="border border-gold/60 bg-gold/15 px-1.5 py-0.5 font-mono text-[8px] font-semibold tracking-[0.25em] text-gold">
+                          {d.promo.stamp}
+                        </span>
+                      )}
                     </span>
                     <span className="mt-0.5 font-mono text-[11px] text-faint">{e.repoFullName}</span>
                     <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-faint">

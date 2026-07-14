@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import localFont from "next/font/local";
-import { getLang, t } from "../lib/i18n";
-import { LangToggle } from "../components/lang-toggle";
+import { t } from "../lib/i18n";
 import "./globals.css";
 
 const marcellus = localFont({
@@ -28,11 +27,10 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const lang = await getLang();
-  const d = t(lang);
+  const d = t();
 
   return (
-    <html lang={lang} className={`${marcellus.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${marcellus.variable} ${plexMono.variable}`}>
       <body className="min-h-screen">
         <header className="border-b hairline-gold">
           <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-5 sm:py-5">
@@ -42,20 +40,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 {d.layout.tagline}
               </span>
             </Link>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-7">
-              <nav className="flex gap-4 font-mono text-[10px] tracking-[0.15em] text-sage sm:gap-7 sm:text-[11px] sm:tracking-[0.2em]">
-                <Link href="/methodology" className="transition hover:text-gold">
-                  {d.layout.methodology}
-                </Link>
-                <a href="/api/stats" className="transition hover:text-gold">
-                  API
-                </a>
-                <a href="https://github.com" target="_blank" rel="noreferrer" className="transition hover:text-gold">
-                  GITHUB
-                </a>
-              </nav>
-              <LangToggle current={lang} />
-            </div>
+            <nav className="flex flex-wrap items-center gap-4 font-mono text-[10px] tracking-[0.15em] text-sage sm:gap-7 sm:text-[11px] sm:tracking-[0.2em]">
+              <Link href="/methodology" className="transition hover:text-gold">
+                {d.layout.methodology}
+              </Link>
+              <a href="/api/stats" className="transition hover:text-gold">
+                API
+              </a>
+              <a
+                href="https://github.com/aliihsanto/fineness"
+                target="_blank"
+                rel="noreferrer"
+                className="transition hover:text-gold"
+              >
+                GITHUB
+              </a>
+            </nav>
           </div>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-8 sm:px-5 sm:py-10">{children}</main>

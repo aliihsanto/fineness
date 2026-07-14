@@ -1,4 +1,4 @@
-export type Lang = "en" | "tr";
+export type Lang = "en";
 
 type Dict = typeof en;
 
@@ -27,6 +27,12 @@ const en = {
       shipping: "SHIPPING",
     },
     demoBadge: "DEMO DATA — AWAITING DATABASE_URL",
+    promo: {
+      stamp: "HOUSE TOKEN",
+      blurb: "The token of this assay office, launched on Tribe — scored by the same rules as everyone else.",
+      view: "VIEW ASSAY →",
+      trade: "TRADE ON TRIBE ↗",
+    },
     sortBy: "SORT BY",
     sorts: { gap: "REALITY GAP", fineness: "FINENESS", fdv: "FDV", volume: "VOL 24H" },
     tabs: { all: "ALL", tribe: "TRIBE", other: "ESTABLISHED" },
@@ -165,171 +171,7 @@ const en = {
   },
 };
 
-const tr: Dict = {
-  layout: {
-    tagline: "AYAR EVİ — TOKEN'LAŞTIRILMIŞ REPOLAR",
-    methodology: "METODOLOJİ",
-    footer1: "DOĞRULANABİLİR GITHUB VERİSİ · YATIRIM TAVSİYESİ DEĞİLDİR",
-    footer2: "Bu bir gözlemdir, suçlama değildir. Proje sahipleri /api/submit üzerinden eşlemeye itiraz edebilir.",
-  },
-  home: {
-    eyebrow: "GERÇEKLİK KONTROLÜ — CANLI DEFTER",
-    title: "Token'ın arkasındaki repo ne kadar saf?",
-    introA:
-      "Her token'ın deposu doğrulanabilir GitHub verisiyle ayar testinden geçirilir — fork tespiti, AI-slop tespiti, bus factor, launch sonrası çürüme. ",
-    gapWord: "Reality gap",
-    introB:
-      " gerçekten inşa edilen her puan başına ödenen FDV dolarıdır: boşluk büyüdükçe piyasa, var olmayan bir repo için daha çok ödüyor demektir.",
-    stats: {
-      repos: "TARANAN REPO",
-      fdv: "İZLENEN FDV",
-      median: "MEDYAN FINENESS",
-      forks: "FORK",
-      slop: "AI SLOP",
-      dead: "ÖLÜ 14G+",
-      shipping: "SHIPPING",
-    },
-    demoBadge: "DEMO VERİ — DATABASE_URL BEKLENİYOR",
-    sortBy: "SIRALA",
-    sorts: { gap: "REALITY GAP", fineness: "FINENESS", fdv: "FDV", volume: "HACİM 24S" },
-    tabs: { all: "TÜMÜ", tribe: "TRIBE", other: "YERLEŞİK" },
-    filters: { fdv: "MİN FDV", vol: "MİN HACİM 24S", mcap: "MİN MCAP", grade: "DERECE", any: "HEPSİ", apply: "UYGULA", clear: "TEMİZLE" },
-    grades: { base: "BASE METAL", alloyed: "ALLOYED", high: "HIGH PURITY" },
-    noMatch: "Bu filtrelere uyan token yok.",
-    platform: "PLATFORM",
-    filtersTitle: "FİLTRELER",
-    prev: "← ÖNCEKİ",
-    next: "SONRAKİ →",
-    showing: (a: number, b: number, n: number) => `${n} KAYITTAN ${a}–${b} GÖSTERİLİYOR`,
-    th: {
-      token: "TOKEN",
-      fineness: "FINENESS",
-      fdv: "FDV",
-      vol: "HACİM 24S",
-      gap: "REALITY GAP",
-      stars: "STAR",
-      devs: "DEV 30G",
-      flags: "BAYRAKLAR",
-      weeks: "12 HAFTA",
-    },
-    liq: "LİK",
-    holders: "HOLDER",
-    lastPush: (d: number) => `SON PUSH ${d}G`,
-    pushedToday: "BUGÜN PUSH",
-    forks: "FORK",
-    commits: "COMMIT",
-    repoAge: "REPO YAŞI",
-  },
-  token: {
-    assayReport: "AYAR RAPORU — TOKEN'LAŞTIRILMIŞ REPO",
-    demoRepo: "DEMO — KURGUSAL REPO",
-    launched: (d: number) => `${d}g önce launch`,
-    fdv: "FDV",
-    gap: "REALITY GAP",
-    lastCommit: "SON COMMIT",
-    today: "BUGÜN",
-    daysAgo: (d: number) => `${d}G ÖNCE`,
-    share: "X'TE PAYLAŞ",
-    verdict: (total: number, grade: string, defects: number, gap: string | null) =>
-      `${total}/100 — ${grade}. ${defects} kusur damgası.` +
-      (gap ? ` Piyasa, doğrulanabilir her inşa puanı için ${gap} ödüyor.` : ""),
-    sections: {
-      market: "PİYASA",
-      repository: "REPO",
-      notes: "AYAR NOTLARI",
-      subscores: "ALT SKORLAR",
-      hours: "COMMIT SAATLERİ — 24S UTC",
-      activity: "COMMIT AKTİVİTESİ — HAFTALIK",
-      signals: "HAM SİNYALLER",
-    },
-    hoursCaption:
-      "İnsanlar uyur: gerçek bir ekip bu histogramda 4+ saatlik boşluk bırakır. Dümdüz bir dağılım makine push'u demektir.",
-    signalsHint: "HER SKOR BU GİRDİLERDEN YENİDEN HESAPLANABİLİR — MATEMATİĞİMİZİ KONTROL EDİN.",
-    market: {
-      price: "FİYAT",
-      fdv: "FDV",
-      mcap: "PİYASA DEĞERİ",
-      vol: "HACİM 24S",
-      liq: "LİKİDİTE",
-      holders: "HOLDER",
-    },
-    repo: {
-      stars: "STAR",
-      forks: "FORK",
-      watchers: "İZLEYEN",
-      issues: "AÇIK ISSUE",
-      language: "DİL",
-      license: "LİSANS",
-      none: "YOK",
-      age: "REPO YAŞI",
-      commits30: "COMMIT 30G",
-      devs30: "DEV 30G",
-      decay: "LAUNCH ÇÜRÜMESİ",
-    },
-    subs: [
-      { key: "authenticity", name: "ÖZGÜNLÜK", desc: "kod gerçekten onların mı?" },
-      { key: "antislop", name: "ANTİ-SLOP", desc: "insan emeği mi, AI dökümü mü?" },
-      { key: "busfactor", name: "BUS FACTOR", desc: "tek kişi gidince hayatta kalır mı?" },
-      { key: "momentum", name: "MOMENTUM", desc: "launch'tan sonra yaşıyor mu?" },
-      { key: "community", name: "TOPLULUK", desc: "organik ilgi mi, satın alınmış star mı?" },
-    ],
-  },
-  notes: {
-    fork: (p: string) => `Repo, ${p} deposunun fork'u.`,
-    hiddenFork: "Dosya hash'leri bilinen popüler bir kod tabanıyla eşleşiyor — gizli fork.",
-    firstDump: (n: string) => `İlk commit tek seferde ${n} satır döktü.`,
-    medianHigh: (n: string) => `Medyan commit ${n} satır ekliyor — insan aralığı 30-250'dir.`,
-    medianOk: (n: number) => `Medyan commit ${n} satır ekliyor — elle yazılan iterasyonla tutarlı.`,
-    burst: (p: number) => `Commit'lerin %${p}'i 3 dakikadan kısa aralıklarla atılmış — makineli tüfek push'u.`,
-    noSleep: "24 saatlik commit histogramında uyku boşluğu yok — bunu gece gündüz elle push eden olmamış.",
-    sleep: "Commit histogramı net bir gece boşluğu gösteriyor — insan uyku düzeni.",
-    decayBad: (p: number) => `Commit temposu launch'tan sonraki bir hafta içinde launch öncesinin %${p}'ine düştü.`,
-    decayGood: "Commit temposu launch sonrasında korundu veya hızlandı.",
-    fakeStars: (stars: string, forks: number, issues: number, ratio: number) =>
-      `${forks} fork ve ${issues} açık issue'ya karşılık ${stars} star — anomali oranı ${ratio}. Organik repolar böyle görünmez.`,
-    stale: (d: number) => `${d} gündür push yok.`,
-    solo: "Son 30 günde fiilen tek yazar — bus factor bir.",
-    team: (n: number) => `Son 30 günde ${n} farklı katkıcı aktif.`,
-    shipping: "Son 48 saat içinde commit atılmış — hâlâ üretiyor.",
-  },
-  methodology: {
-    eyebrow: "METODOLOJİ",
-    title: "Fineness skoru nasıl çalışır",
-    intro:
-      "Fineness, altının binde saflık ayarıdır — 999 saftır, 400 çoğunlukla dolgudur. Aynı fikri token'ların arkasındaki repolara uyguluyoruz. Her skor 0-100 arasıdır ve beş doğrulanabilir alt skordan oluşur. Fiyat tahmini yok, al/sat sinyali yok — yalnızca herkesin kontrol edebileceği GitHub verisi.",
-    sections: [
-      {
-        title: "ÖZGÜNLÜK — 30 PUAN",
-        body: "Kod gerçekten onların mı? GitHub fork bayrağı (−30), popüler repo korpusuna karşı dosya hash parmak iziyle yakalanan gizli fork'lar (−25), package.json / LICENSE / README ile repo sahibi arasındaki kimlik uyumsuzlukları (her biri −10), ilk commit'te 5.000+ satır döküm (−15), silinmiş git geçmişi (−10).",
-      },
-      {
-        title: "ANTİ-SLOP — 25 PUAN",
-        body: "Bunu insanlar zamanla mı inşa etti, yoksa bir AI bir gecede mi döktü? Commit boyutu dağılımı (insan medyanı ~30-250 satır), makineli tüfek commit patlamaları (<3 dk arayla), commit mesajı entropisi (şablon mesajlar tek kovaya düşer), sirkadiyen ritim (insanlar uyur; 4 saatlik boşluğu olmayan 24 saatlik histogram şüphelidir) ve mühendislik hijyeni (test, CI, lockfile).",
-      },
-      {
-        title: "BUS FACTOR — 15 PUAN",
-        body: "Son 90 günün bot olmayan commit'leri üzerinden 15 × (1 − Gini) × min(uniqueAuthors/4, 1). Commit'lerin %95'ini tek kişinin attığı repo sıfıra yakın puan alır.",
-      },
-      {
-        title: "MOMENTUM — 20 PUAN",
-        body: "Tazelik üstel azalır: exp(−sonPushtanBeriGün / 10). Launch sonrası çürüme oranı, launch'tan sonraki 7 günün commit'lerini önceki 7 günle karşılaştırır — 0.2'nin altı RUG WATCH bayrağını kaldırır.",
-      },
-      {
-        title: "TOPLULUK — 10 PUAN",
-        body: "Star hızı artı etkileşim karışımı. Fork, issue ve izleyici sıfıra yakınken yüksek star organik değildir — FAKE STARS bayrağı kalkar ve alt skor yarıya iner.",
-      },
-    ],
-    gapTitle: "REALITY GAP",
-    gapBody:
-      "— doğrulanabilir inşanın her puanı başına düşen tam seyreltilmiş değerleme doları. Liderlik tablosu buna göre sıralanır.",
-    transparencyTitle: "ŞEFFAFLIK",
-    transparencyBody:
-      "Her skor sayfası, hesaplandığı ham sinyalleri gösterir ve skorlama motoru açık kaynaktır (@fineness/scoring) — kendiniz çalıştırabilirsiniz. Skorlar algo_version taşır; formül değiştiğinde her şey yeniden hesaplanır. Reponuzu yanlış değerlendirdiysek submit endpoint'i üzerinden itiraz edin.",
-  },
-};
 
-const dicts: Record<Lang, Dict> = { en, tr };
-
-export function t(lang: Lang): Dict {
-  return dicts[lang];
+export function t(_lang?: Lang): Dict {
+  return en;
 }

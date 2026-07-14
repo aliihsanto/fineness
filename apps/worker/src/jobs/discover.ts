@@ -1,5 +1,6 @@
 import { createDb } from "@fineness/db";
-import { discoverCategory, discoverDexProfiles, fetchTokenQuote } from "@fineness/market";
+import { cgSleep, discoverDexProfiles, fetchTokenQuote, hydrateCoin, listCategoryCoins } from "@fineness/market";
+import type { CategoryCoin } from "@fineness/market";
 import { autoMap } from "./map-auto";
 
 /**
@@ -30,40 +31,78 @@ export async function discoverDex(): Promise<number> {
   return created;
 }
 
+/** builder-heavy CoinGecko categories — the ones whose coins actually link a repo */
+export const CG_CATEGORIES = [
+  "ai-agents",
+  "artificial-intelligence",
+  "smart-contract-platform",
+  "layer-1",
+  "layer-2",
+  "infrastructure",
+  "decentralized-finance-defi",
+  "decentralized-exchange",
+  "oracle",
+  "depin",
+  "zero-knowledge-zk",
+  "storage",
+  "interoperability",
+  "data-availability",
+];
+
 /**
- * CoinGecko discovery — daily. AI categories carry GitHub links in coin
- * metadata; this back-fills the established-token side of the ledger.
+ * CoinGecko discovery — daily cron and bulk backfills. Coins are collected
+ * across all categories first and deduped by id, so a coin sitting in three
+ * categories costs one detail call, then each is mapped into the ledger the
+ * moment it hydrates — a long run grows the site incrementally.
  */
-export async function discoverCoingecko(categories = ["ai-agents", "artificial-intelligence"], limit = 100) {
+export async function discoverCoingecko(categories = CG_CATEGORIES, limit = 100, throttleMs = 15_000) {
   const db = createDb();
-  let created = 0;
+
+  const seen = new Set<string>();
+  const queue: CategoryCoin[] = [];
   for (const category of categories) {
-    let coins;
+    await cgSleep(throttleMs);
+    let coins: CategoryCoin[];
     try {
-      coins = await discoverCategory(category, limit);
+      coins = await listCategoryCoins(category, limit);
     } catch (err) {
       console.warn(`[discover] coingecko category ${category} failed:`, (err as Error).message);
       continue;
     }
-    console.log(`[discover] coingecko ${category}: ${coins.length} coins`);
-    for (const coin of coins) {
-      if (!coin.github) continue;
-      const chains = Object.entries(coin.contracts);
-      if (chains.length === 0) continue; // native-chain coins can't be quoted via DexScreener
-      const [chain, address] = chains[0]!;
-      const ok = await autoMap(db, {
-        chain,
-        address,
-        symbol: coin.symbol,
-        name: coin.name,
-        repoOwner: coin.github.owner,
-        repoName: coin.github.name,
-        platform: "other",
-        source: `coingecko ${category}`,
-      });
-      if (ok) created++;
+    let fresh = 0;
+    for (const m of coins) {
+      if (seen.has(m.id)) continue;
+      seen.add(m.id);
+      queue.push(m);
+      fresh++;
     }
+    console.log(`[discover] coingecko ${category}: ${coins.length} coins, ${fresh} new to this run`);
   }
-  console.log(`[discover] coingecko done — ${created} new`);
+  console.log(`[discover] coingecko: ${queue.length} unique coins to hydrate (~${Math.round((queue.length * throttleMs) / 60_000)} min)`);
+
+  let created = 0;
+  let processed = 0;
+  for (const m of queue) {
+    await cgSleep(throttleMs);
+    processed++;
+    const coin = await hydrateCoin(m);
+    if (!coin?.github) continue;
+    const chains = Object.entries(coin.contracts);
+    if (chains.length === 0) continue; // native-chain coins can't be quoted via DexScreener
+    const [chain, address] = chains[0]!;
+    const ok = await autoMap(db, {
+      chain,
+      address,
+      symbol: coin.symbol,
+      name: coin.name,
+      repoOwner: coin.github.owner,
+      repoName: coin.github.name,
+      platform: "other",
+      source: "coingecko",
+    });
+    if (ok) created++;
+    if (processed % 25 === 0) console.log(`[discover] coingecko progress ${processed}/${queue.length} — ${created} new`);
+  }
+  console.log(`[discover] coingecko done — ${created} new of ${queue.length} coins`);
   return created;
 }

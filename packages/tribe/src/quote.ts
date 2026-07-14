@@ -26,16 +26,43 @@ export type TribeQuote = {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+type SigInfo = { signature: string; err: unknown; blockTime: number | null };
+
+/**
+ * All non-failed signatures touching the mint since `sinceTs`, paginated —
+ * a fixed "last 15" window undercounts 24h volume badly on active tokens.
+ * Capped so a viral token can't turn one quote into thousands of RPC calls.
+ */
+async function signaturesSince(rpc: SolanaRpc, mint: string, sinceTs: number, cap = 150): Promise<SigInfo[]> {
+  const out: SigInfo[] = [];
+  let before: string | undefined;
+  while (out.length < cap) {
+    const page = await rpc.call<SigInfo[]>("getSignaturesForAddress", [
+      mint,
+      { limit: 100, ...(before ? { before } : {}) },
+    ]);
+    if (page.length === 0) break;
+    for (const sig of page) {
+      if (sig.blockTime !== null && sig.blockTime < sinceTs) return out;
+      if (!sig.err) out.push(sig);
+      if (out.length >= cap) return out;
+    }
+    before = page[page.length - 1]!.signature;
+    if (page.length < 100) break;
+  }
+  return out;
+}
+
 export async function fetchTribeTrades(
   rpc: SolanaRpc,
   mint: string,
-  opts: { limit?: number; throttleMs?: number } = {},
+  opts: { limit?: number; throttleMs?: number; sinceTs?: number } = {},
 ): Promise<TribeTrade[]> {
   // transferChecked references the mint account, so swap txs are indexed on it
-  const sigs = await rpc.call<{ signature: string; err: unknown; blockTime: number | null }[]>(
-    "getSignaturesForAddress",
-    [mint, { limit: opts.limit ?? 15 }],
-  );
+  const sigs =
+    opts.sinceTs !== undefined
+      ? await signaturesSince(rpc, mint, opts.sinceTs, opts.limit ?? 150)
+      : await rpc.call<SigInfo[]>("getSignaturesForAddress", [mint, { limit: opts.limit ?? 15 }]);
 
   const trades: TribeTrade[] = [];
   for (const sig of sigs) {
@@ -89,7 +116,11 @@ export async function fetchTribeQuote(
   mint: string,
   solUsd: number | null,
 ): Promise<TribeQuote | null> {
-  const trades = await fetchTribeTrades(rpc, mint);
+  const dayAgoTs = Math.floor(Date.now() / 1000) - 86_400;
+  // full 24h window for volume; if the token didn't trade today, fall back to
+  // the latest historical trades so price/FDV still resolve
+  let trades = await fetchTribeTrades(rpc, mint, { sinceTs: dayAgoTs });
+  if (trades.length === 0) trades = await fetchTribeTrades(rpc, mint, { limit: 25 });
   const last = trades[0];
   if (!last) return null;
 

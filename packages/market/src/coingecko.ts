@@ -24,6 +24,13 @@ const CHAIN_MAP: Record<string, string> = {
   "binance-smart-chain": "bsc",
   "arbitrum-one": "arbitrum",
   "polygon-pos": "polygon",
+  avalanche: "avalanche",
+  "optimistic-ethereum": "optimism",
+  fantom: "fantom",
+  sui: "sui",
+  aptos: "aptos",
+  tron: "tron",
+  "the-open-network": "ton",
 };
 
 async function cg<T>(path: string): Promise<T> {
@@ -45,47 +52,62 @@ export function extractGithubRepo(url: string): { owner: string; name: string } 
   return { owner: m[1], name: m[2] };
 }
 
+export type CategoryCoin = { id: string; symbol: string; name: string; fdv: number | null };
+
+/** one markets call — the top coins of a category, no detail hydration */
+export async function listCategoryCoins(category: string, limit = 100): Promise<CategoryCoin[]> {
+  const markets = await cg<{ id: string; symbol: string; name: string; fully_diluted_valuation: number | null }[]>(
+    `/coins/markets?vs_currency=usd&category=${encodeURIComponent(category)}&per_page=${Math.min(limit, 250)}&page=1`,
+  );
+  return markets.map((m) => ({ id: m.id, symbol: m.symbol.toUpperCase(), name: m.name, fdv: m.fully_diluted_valuation }));
+}
+
+/** one detail call — repo link + contract addresses for a coin */
+export async function hydrateCoin(m: CategoryCoin): Promise<DiscoveredCoin | null> {
+  let detail: any;
+  try {
+    detail = await cg<any>(
+      `/coins/${m.id}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`,
+    );
+  } catch (err) {
+    console.warn(`[coingecko] detail failed for ${m.id}:`, (err as Error).message);
+    return null;
+  }
+
+  const ghUrl: string | undefined = (detail.links?.repos_url?.github ?? []).find(Boolean);
+  const contracts: Record<string, string> = {};
+  for (const [platform, addr] of Object.entries(detail.platforms ?? {})) {
+    const chain = CHAIN_MAP[platform];
+    if (chain && typeof addr === "string" && addr) contracts[chain] = addr;
+  }
+
+  return {
+    id: m.id,
+    symbol: m.symbol,
+    name: m.name,
+    fdv: m.fdv,
+    github: ghUrl ? extractGithubRepo(ghUrl) : null,
+    contracts,
+  };
+}
+
 /** top coins of a category, hydrated with repo link + contract addresses */
 export async function discoverCategory(
   category: string,
   limit = 30,
   throttleMs = 15_000,
 ): Promise<DiscoveredCoin[]> {
-  const markets = await cg<{ id: string; symbol: string; name: string; fully_diluted_valuation: number | null }[]>(
-    `/coins/markets?vs_currency=usd&category=${encodeURIComponent(category)}&per_page=${limit}&page=1`,
-  );
-
+  const markets = await listCategoryCoins(category, limit);
   const out: DiscoveredCoin[] = [];
   for (const m of markets) {
     await sleep(throttleMs);
-    let detail: any;
-    try {
-      detail = await cg<any>(
-        `/coins/${m.id}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`,
-      );
-    } catch (err) {
-      console.warn(`[coingecko] detail failed for ${m.id}:`, (err as Error).message);
-      continue;
-    }
-
-    const ghUrl: string | undefined = (detail.links?.repos_url?.github ?? []).find(Boolean);
-    const contracts: Record<string, string> = {};
-    for (const [platform, addr] of Object.entries(detail.platforms ?? {})) {
-      const chain = CHAIN_MAP[platform];
-      if (chain && typeof addr === "string" && addr) contracts[chain] = addr;
-    }
-
-    out.push({
-      id: m.id,
-      symbol: m.symbol.toUpperCase(),
-      name: m.name,
-      fdv: m.fully_diluted_valuation,
-      github: ghUrl ? extractGithubRepo(ghUrl) : null,
-      contracts,
-    });
+    const coin = await hydrateCoin(m);
+    if (coin) out.push(coin);
   }
   return out;
 }
+
+export const cgSleep = sleep;
 
 /** DexScreener latest token profiles + boosts — catches fresh tokens whose profile links a repo */
 export async function discoverDexProfiles(): Promise<

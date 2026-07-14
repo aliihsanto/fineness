@@ -26,16 +26,21 @@ export async function fetchTokenQuote(chain: string, mintAddress: string): Promi
   const pairs = (await res.json()) as any[];
   if (!Array.isArray(pairs) || pairs.length === 0) return null;
 
-  const best = pairs
-    .slice()
-    .sort((a, b) => (b?.liquidity?.usd ?? 0) - (a?.liquidity?.usd ?? 0))[0];
+  // price/fdv come from the deepest pool, but volume and liquidity are summed
+  // across every pool where this token is the base — one-pair numbers wildly
+  // undercount tokens that trade on several DEXes/chains
+  const mine = pairs.filter((p) => p?.baseToken?.address?.toLowerCase() === mintAddress.toLowerCase());
+  const pool = mine.length > 0 ? mine : pairs;
+  const best = pool.slice().sort((a, b) => (b?.liquidity?.usd ?? 0) - (a?.liquidity?.usd ?? 0))[0];
+  const volume24h = pool.reduce((s, p) => s + (p?.volume?.h24 ?? 0), 0);
+  const liquidity = pool.reduce((s, p) => s + (p?.liquidity?.usd ?? 0), 0);
 
   return {
     priceUsd: best.priceUsd ? Number(best.priceUsd) : null,
     fdv: best.fdv ?? null,
     mcap: best.marketCap ?? null,
-    volume24h: best.volume?.h24 ?? null,
-    liquidity: best.liquidity?.usd ?? null,
+    volume24h: volume24h > 0 ? volume24h : null,
+    liquidity: liquidity > 0 ? liquidity : null,
     pairAddress: best.pairAddress ?? null,
     baseSymbol: best.baseToken?.symbol ?? null,
     baseName: best.baseToken?.name ?? null,

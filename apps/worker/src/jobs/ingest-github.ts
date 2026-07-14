@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { createDb, schema } from "@fineness/db";
 import { GithubClient } from "@fineness/github";
 import { isBotLogin } from "../lib";
@@ -66,7 +66,11 @@ export async function ingestGithub(payload: { owner: string; name: string }) {
           messageHeadline: c.messageHeadline,
         })),
       )
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: [schema.commits.repoId, schema.commits.sha],
+        // messages got richer over time (full body vs headline) — refresh on rescan
+        set: { messageHeadline: sql`excluded.message_headline` },
+      });
   }
 
   return repoId;

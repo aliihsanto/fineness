@@ -50,6 +50,19 @@ Run the scoring calibration suite:
 pnpm --filter @fineness/scoring test
 ```
 
+## Public API
+
+No auth, no key, CORS open — docs at [fineness.xyz/docs](https://fineness.xyz/docs).
+
+```
+GET  /api                      endpoint index
+GET  /api/stats                ledger-wide aggregates
+GET  /api/leaderboard          ?platform=tribe|other &sort=gap|fineness|fdv|volume &flag=FORK &limit=100
+GET  /api/token/{symbol}       full assay report incl. raw scoring signals
+GET  /api/score/{owner}/{repo} same report, looked up by GitHub repo
+POST /api/submit               submit or dispute a token↔repo mapping
+```
+
 ## Disclaimers
 
 Data shown is an observation, not an accusation, and is **not investment advice**.

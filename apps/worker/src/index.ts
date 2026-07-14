@@ -13,7 +13,7 @@ import {
 import { ingestGithub } from "./jobs/ingest-github";
 import { ingestMarket } from "./jobs/ingest-market";
 import { ingestTribe } from "./jobs/ingest-tribe";
-import { discoverCoingecko, discoverDex } from "./jobs/discover";
+import { discoverCoingecko, discoverDex, discoverLlama } from "./jobs/discover";
 import { computeScore } from "./jobs/compute-score";
 import { snapshotAll } from "./jobs/snapshot";
 
@@ -65,7 +65,8 @@ const workers = [
   }),
   new Worker(
     QUEUE_NAMES.discover,
-    async (job) => (job.name === "coingecko" ? discoverCoingecko() : discoverDex()),
+    async (job) =>
+      job.name === "coingecko" ? discoverCoingecko() : job.name === "llama" ? discoverLlama() : discoverDex(),
     { connection, concurrency: 1 },
   ),
 ];
@@ -92,5 +93,6 @@ await ingestTribeQueue.upsertJobScheduler("tribe-sweep", { pattern: "*/10 * * * 
 // discovery beyond tribe: dexscreener profiles every 30 min, coingecko AI categories daily
 await discoverQueue.upsertJobScheduler("discover-dex", { pattern: "*/30 * * * *" }, { name: "dex" });
 await discoverQueue.upsertJobScheduler("discover-coingecko", { pattern: "30 4 * * *" }, { name: "coingecko" });
+await discoverQueue.upsertJobScheduler("discover-llama", { pattern: "0 5 * * 0" }, { name: "llama" });
 
 console.log("[worker] fineness worker up — queues:", Object.values(QUEUE_NAMES).join(", "));

@@ -1,7 +1,55 @@
 import { createDb } from "@fineness/db";
-import { cgSleep, discoverDexProfiles, fetchTokenQuote, hydrateCoin, listCategoryCoins } from "@fineness/market";
+import {
+  cgSleep,
+  discoverDexProfiles,
+  fetchLlamaProtocols,
+  fetchTokenQuote,
+  hydrateCoin,
+  listCategoryCoins,
+} from "@fineness/market";
 import type { CategoryCoin } from "@fineness/market";
+import { GithubClient } from "@fineness/github";
 import { autoMap } from "./map-auto";
+
+/**
+ * DefiLlama discovery — free and keyless. ~850 protocols ship a token address
+ * plus a GitHub org; we resolve each org to its most-starred repo and run the
+ * standard pipeline. TVL-ordered, so a limit takes the most established first.
+ */
+export async function discoverLlama(limit = 300): Promise<number> {
+  const db = createDb();
+  const gh = GithubClient.fromEnv();
+  const protocols = (await fetchLlamaProtocols()).slice(0, limit);
+  console.log(`[discover] defillama: ${protocols.length} protocol(s) with github + address`);
+
+  let created = 0;
+  let processed = 0;
+  for (const p of protocols) {
+    processed++;
+    let repo: { owner: string; name: string } | null = null;
+    try {
+      repo = await gh.topRepo(p.githubOrg);
+    } catch (err) {
+      console.warn(`[discover] top-repo lookup failed for ${p.githubOrg}:`, (err as Error).message);
+    }
+    if (!repo) continue;
+    const ok = await autoMap(db, {
+      chain: p.chain,
+      address: p.address,
+      symbol: p.symbol,
+      name: p.name,
+      repoOwner: repo.owner,
+      repoName: repo.name,
+      platform: "other",
+      source: "defillama",
+    });
+    if (ok) created++;
+    if (processed % 25 === 0) console.log(`[discover] defillama progress ${processed}/${protocols.length} — ${created} new`);
+    await cgSleep(700); // gentle on dexscreener/github, still ~85/min
+  }
+  console.log(`[discover] defillama done — ${created} new of ${protocols.length}`);
+  return created;
+}
 
 /**
  * DexScreener discovery — every 30 min. Latest token profiles/boosts whose

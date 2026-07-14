@@ -1,4 +1,5 @@
 export { fetchTokenQuote, type MarketQuote } from "./dexscreener";
+export { fetchLlamaProtocols, type LlamaProtocol } from "./defillama";
 export {
   cgSleep,
   discoverCategory,

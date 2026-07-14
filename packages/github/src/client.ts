@@ -96,11 +96,57 @@ export type RepoScan = {
 const TEST_HINTS = ["test", "tests", "__tests__", "spec", "vitest.config.ts", "jest.config.js", "jest.config.ts"];
 const LOCKFILES = ["pnpm-lock.yaml", "package-lock.json", "yarn.lock", "bun.lockb", "bun.lock", "Cargo.lock", "poetry.lock", "uv.lock"];
 
+// flagship repo of an org (or user) — the one a protocol's token actually points at
+const TOP_REPO_QUERY = /* GraphQL */ `
+  query ($login: String!) {
+    repositoryOwner(login: $login) {
+      ... on Organization {
+        repositories(first: 3, isFork: false, orderBy: { field: STARGAZERS, direction: DESC }) {
+          nodes {
+            name
+            stargazerCount
+          }
+        }
+      }
+      ... on User {
+        repositories(first: 3, isFork: false, orderBy: { field: STARGAZERS, direction: DESC }) {
+          nodes {
+            name
+            stargazerCount
+          }
+        }
+      }
+    }
+    rateLimit {
+      remaining
+      resetAt
+    }
+  }
+`;
+
 export class GithubClient {
   constructor(private pool: TokenPool) {}
 
   static fromEnv(): GithubClient {
     return new GithubClient(TokenPool.fromEnv());
+  }
+
+  /** most-starred non-fork repo of an org/user, or null when the login is gone */
+  async topRepo(login: string): Promise<{ owner: string; name: string; stars: number } | null> {
+    const token = this.pool.pick();
+    let res: any;
+    try {
+      res = await graphql(TOP_REPO_QUERY, { login, headers: { authorization: `token ${token}` } });
+    } catch (err: any) {
+      if (err?.data?.rateLimit) {
+        this.pool.report(token, err.data.rateLimit.remaining, err.data.rateLimit.resetAt);
+      }
+      if (err?.errors?.some((e: any) => e.type === "NOT_FOUND")) return null;
+      throw err;
+    }
+    this.pool.report(token, res.rateLimit.remaining, res.rateLimit.resetAt);
+    const top = res.repositoryOwner?.repositories?.nodes?.[0];
+    return top ? { owner: login, name: top.name, stars: top.stargazerCount } : null;
   }
 
   async scanRepo(owner: string, name: string): Promise<RepoScan | null> {

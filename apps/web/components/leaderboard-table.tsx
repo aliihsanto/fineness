@@ -284,11 +284,13 @@ export function LeaderboardTable({
         </summary>
         <div className="border-t hairline p-4">{panel}</div>
       </details>
-      <aside className="hidden self-start lg:sticky lg:top-6 lg:block">{panel}</aside>
+      <aside className="scroll-slim hidden self-start lg:sticky lg:top-6 lg:block lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:pr-2">
+        {panel}
+      </aside>
 
       <div className="min-w-0">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px]">
+        <div className="scroll-slim overflow-x-auto">
+          <table className="w-full min-w-[680px]">
             <thead>
               <tr className="border-b hairline-gold text-left font-mono text-[10px] tracking-[0.2em] text-faint">
                 <th className="py-3 pr-3 font-normal">No.</th>
@@ -329,7 +331,9 @@ export function LeaderboardTable({
                           </span>
                         )}
                       </span>
-                      <span className="mt-0.5 font-mono text-[11px] text-faint">{e.repoFullName}</span>
+                      <span className="mt-0.5 max-w-[210px] truncate font-mono text-[11px] text-faint">
+                        {e.repoFullName}
+                      </span>
                       <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-faint">
                         {e.chain} · {e.platform}
                         {e.language ? ` · ${e.language}` : ""}

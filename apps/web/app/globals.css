@@ -47,6 +47,23 @@ body {
   color: transparent;
 }
 
+/* slim, unobtrusive scrollbars for panels that scroll independently */
+.scroll-slim {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(237, 232, 216, 0.18) transparent;
+}
+.scroll-slim::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-slim::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  background: rgba(237, 232, 216, 0.18);
+  border-radius: 3px;
+}
+
 /* purity bar ruler ticks */
 .ruler {
   background-image: repeating-linear-gradient(

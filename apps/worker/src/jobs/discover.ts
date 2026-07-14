@@ -82,15 +82,14 @@ export async function discoverCoingecko(categories = CG_CATEGORIES, limit = 100,
 
   let created = 0;
   let processed = 0;
-  for (const m of queue) {
-    await cgSleep(throttleMs);
-    processed++;
+  const mapCoin = async (m: CategoryCoin): Promise<boolean | null> => {
     const coin = await hydrateCoin(m);
-    if (!coin?.github) continue;
+    if (coin === null) return null; // hydration failed (usually 429) — retryable
+    if (!coin.github) return false;
     const chains = Object.entries(coin.contracts);
-    if (chains.length === 0) continue; // native-chain coins can't be quoted via DexScreener
+    if (chains.length === 0) return false; // native-chain coins can't be quoted via DexScreener
     const [chain, address] = chains[0]!;
-    const ok = await autoMap(db, {
+    return autoMap(db, {
       chain,
       address,
       symbol: coin.symbol,
@@ -100,8 +99,25 @@ export async function discoverCoingecko(categories = CG_CATEGORIES, limit = 100,
       platform: "other",
       source: "coingecko",
     });
-    if (ok) created++;
+  };
+
+  const failed: CategoryCoin[] = [];
+  for (const m of queue) {
+    await cgSleep(throttleMs);
+    processed++;
+    const ok = await mapCoin(m);
+    if (ok === null) failed.push(m);
+    else if (ok) created++;
     if (processed % 25 === 0) console.log(`[discover] coingecko progress ${processed}/${queue.length} — ${created} new`);
+  }
+
+  // rate-limited coins get a second, slower pass instead of silently dropping
+  if (failed.length > 0) {
+    console.log(`[discover] coingecko retrying ${failed.length} rate-limited coin(s) at ${(throttleMs * 2) / 1000}s pace`);
+    for (const m of failed) {
+      await cgSleep(throttleMs * 2);
+      if (await mapCoin(m)) created++;
+    }
   }
   console.log(`[discover] coingecko done — ${created} new of ${queue.length} coins`);
   return created;

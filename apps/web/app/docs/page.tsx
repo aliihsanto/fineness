@@ -29,6 +29,13 @@ const ENDPOINTS = [
   },
   {
     method: "GET",
+    path: "/api/badge/{symbol}",
+    desc: "SVG score badge for your README — color follows the grade. Wear your fineness; every embed links back to the assay.",
+    params: [],
+    example: "[![fineness](https://fineness.xyz/api/badge/FINENESS)](https://fineness.xyz/t/FINENESS)",
+  },
+  {
+    method: "GET",
     path: "/api/stats",
     desc: "Ledger-wide aggregates: repos assayed, total FDV tracked, median fineness, flag rates. Built for bots and dashboards.",
     params: [],

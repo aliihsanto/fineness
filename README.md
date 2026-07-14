@@ -11,6 +11,12 @@
   <a href="https://tribe.run/token/8eUAUP9R8uqJ2MiUoDF6xF2AxNAXmfp4G1DSe4Mki4f4">$FINENESS on Tribe</a>
 </p>
 
+<p align="center">
+  <a href="https://fineness.xyz/t/FINENESS"><img src="https://fineness.xyz/api/badge/FINENESS" alt="fineness score"></a>
+</p>
+
+<p align="center"><i>Yes, we score ourselves with the same rules. No, we don't get to cheat.</i></p>
+
 **GitHub reality check for tokenized repos.** Scan the repo behind any token — get a
 verifiable **fineness score** (0-100), like gold purity for code:
 

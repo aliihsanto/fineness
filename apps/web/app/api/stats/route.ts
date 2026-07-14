@@ -12,7 +12,8 @@ export async function GET() {
       product: "fineness",
       description: "GitHub reality check for tokenized repos",
       ...stats,
-      docs: "/methodology",
+      docs: "/docs",
+      endpoints: "/api",
     },
     { headers: { "access-control-allow-origin": "*" } },
   );

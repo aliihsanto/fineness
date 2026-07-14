@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import localFont from "next/font/local";
 import { t } from "../lib/i18n";
+import { LogoMark } from "../components/logo";
 import "./globals.css";
 
 const marcellus = localFont({
@@ -34,19 +35,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen">
         <header className="border-b hairline-gold">
           <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-5 sm:py-5">
-            <Link href="/" className="flex min-w-0 flex-col gap-1">
-              <span className="wordmark text-2xl leading-none sm:text-3xl">fineness</span>
-              <span className="hidden font-mono text-[10px] tracking-[0.3em] text-faint sm:block">
-                {d.layout.tagline}
+            <Link href="/" className="flex min-w-0 items-center gap-3">
+              <LogoMark className="h-9 w-auto shrink-0 sm:h-10" />
+              <span className="flex min-w-0 flex-col gap-1">
+                <span className="wordmark text-2xl leading-none sm:text-3xl">fineness</span>
+                <span className="hidden font-mono text-[10px] tracking-[0.3em] text-faint sm:block">
+                  {d.layout.tagline}
+                </span>
               </span>
             </Link>
             <nav className="flex flex-wrap items-center gap-4 font-mono text-[10px] tracking-[0.15em] text-sage sm:gap-7 sm:text-[11px] sm:tracking-[0.2em]">
               <Link href="/methodology" className="transition hover:text-gold">
                 {d.layout.methodology}
               </Link>
-              <a href="/api/stats" className="transition hover:text-gold">
+              <Link href="/docs" className="transition hover:text-gold">
                 API
-              </a>
+              </Link>
               <a
                 href="https://github.com/aliihsanto/fineness"
                 target="_blank"

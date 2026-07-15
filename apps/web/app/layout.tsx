@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import localFont from "next/font/local";
 import Image from "next/image";
+import Script from "next/script";
 import { t } from "../lib/i18n";
 import logo from "../assets/logo.png";
 import "./globals.css";
@@ -34,6 +35,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${marcellus.variable} ${plexMono.variable}`}>
       <body className="min-h-screen">
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-G98F7L1B3Z" strategy="afterInteractive" />
+        <Script id="ga4" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-G98F7L1B3Z');
+        `}</Script>
         <header className="border-b hairline-gold">
           <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-5 sm:py-5">
             <Link href="/" className="flex min-w-0 items-center gap-3">
